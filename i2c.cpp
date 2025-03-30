@@ -17,7 +17,7 @@ void mw_init()
     // activate internal pullups for twi.
     PORTC |= (1 << PC4); // pullup for sda
     PORTC |= (1 << PC5); // pullup for scl
-};
+}
 
 /**
  * @brief Send data to the slave device over I2C
