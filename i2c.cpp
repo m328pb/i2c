@@ -27,18 +27,24 @@ void mw_init()
  * @details
  * This function sends data to the slave device over I2C.
  * It sends a start condition, the slave device address (with W bit set),
- * the data, and a stop condition. It returns 1 on success, and 0 on error.
+ * the data, and a stop condition. It returns I2C_status (TWSR codes).
  */
-bool mw_write(uint8_t *data, uint8_t len)
+
+I2C_status mw_write(uint8_t *data, uint8_t len)
 // must be 8 bit data
 {
+    I2C_status status = TW_NO_INFO;
     // Master Transmitter Mode (atmega328p, pg 185)
     // send start condition
     TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
     while (!(TWCR & (1 << TWINT)))
         ;
-    if ((TWSR & 0xf8) != 0x08) // A START condition has been transmitted
-        return false;
+    status = TWSR_code;
+    if (status != TW_START) // A START condition has been transmitted
+    {
+        mw_stop();
+        return status;
+    };
 
     // build sla+w, slave device address + w bit (0 write to slave)
     TWDR = SSD1306_I2C_ADDRESS << 1;
@@ -46,8 +52,12 @@ bool mw_write(uint8_t *data, uint8_t len)
     TWCR = (1 << TWINT) | (1 << TWEN);
     while (!(TWCR & (1 << TWINT)))
         ;
-    if ((TWSR & 0xf8) != 0x18) // SLA+W transmitted, ACK received
-        return false;
+    status = TWSR_code;
+    if (status != TW_ACK) // SLA+W transmitted, ACK received
+    {
+        mw_stop();
+        return status;
+    };
 
     // send data
     while (len--)
@@ -56,11 +66,16 @@ bool mw_write(uint8_t *data, uint8_t len)
         TWCR = (1 << TWINT) | (1 << TWEN);
         while (!(TWCR & (1 << TWINT)))
             ;
-        if ((TWSR & 0xf8) != 0x28) // data byte transmitted, ACK received
-            return false;
-    }
-
+        status = TWSR_code;
+        if (status != TW_DATA_ACK) // data byte transmitted, ACK received
+        {
+            mw_stop();
+            return status;
+        };
+    };
     // send stop condition
-    TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
-    return true;
+    mw_stop();
+    return status;
 }
+
+void mw_stop() { TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN); }
