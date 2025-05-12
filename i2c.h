@@ -4,7 +4,7 @@
 #define SSD1306_I2C_ADDRESS 0x3C
 #define I2C_FREQ 100000L
 #define TWSR_mask 0xF8 // mask for TWSR register (7..3 bits)
-#define TWSR_code (I2C_status)(TWSR & TWSR_mask)
+#define TWSR_code (I2C_status)(TWSR0 & TWSR_mask)
 
 // I2C protocol status codes (basically TWSR register bits)
 // see atmega328p datasheet, page 186, tab.21-3

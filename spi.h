@@ -20,7 +20,7 @@ uint8_t SPI_transmit(uint8_t cData);
 
 #ifdef __cplusplus
 }
-#endif  
+#endif
 
 #ifdef __cplusplus
 void SPI_init(uint8_t clock_div);
