@@ -38,7 +38,6 @@ I2C::error I2C::write(uint8_t *data, uint8_t len)
 // must be 8 bit data
 {
   status = TW_NO_INFO;
-  error err = NO_ERR;
   // Master Transmitter Mode (atmega328p, pg 185)
   // send start condition
   TWCR0 = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);

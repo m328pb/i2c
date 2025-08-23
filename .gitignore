@@ -2,7 +2,6 @@
 .venv
 .pio
 .cache
-src
 
 # Prerequisites
 *.d
