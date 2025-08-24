@@ -2,7 +2,7 @@
 	"name": "I2C",
 	"version": "0.9.0",
 	"description":"Minimal I2C protocol for ATmega328pb/p. Intended for OLED display and to make it maximum lightweight",
-	"keywords":"I2C, atmega328",
+	"keywords":"I2C, atmega328, avr",
 	"repository":{
 		"type":"git",
 		"url":"https://github.com/zielaskowski/i2c"
@@ -13,5 +13,8 @@
 	},
 	"license":"MIT",
 	"frameworks":"arduino",
-	"platforms":"atmelvar"
+	"platforms":"atmelvar",
+	"examples":[
+		"examples/*/*.c"
+	]
 }
