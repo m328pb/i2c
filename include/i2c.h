@@ -21,31 +21,27 @@
 #error "Unsupported MCU"
 #endif
 
-#define SSD1306_I2C_ADDRESS 0x3C
+#define SSD1306_I2C_ADDRESS 0x3C // default
 #define PCF8574_I2C_ADDRESS 0x27
-#define I2C_FREQ 100000L
-#define TWSR_mask 0xF8 // mask for TWSR register (7..3 bits)
+#define I2C_FREQ 100 // default in kHz!; max 400kHz, but don't exceed 200kHz
+#define TWSR_mask 0xF8  // mask for TWSR register (7..3 bits)
 
 class I2C {
 private:
   // I2C protocol status codes (basically TWSR register bits)
   // see atmega328p datasheet, page 186, tab.21-3
-  uint8_t addr;
+  uint8_t addr = SSD1306_I2C_ADDRESS;
+  uint16_t speed = (uint16_t)I2C_FREQ;
   uint8_t backup_TWIE; // to restore interrupt status
 
-#if defined(ENABLE_I2C_SCAN)
-  void scan();
-#endif
-
   void start();
+  void stop();
   void send_addr(uint8_t addr);
-  uint8_t TWSR_code();
+  void send_byte(uint8_t data);
+  uint8_t TWSR_status();
 
 public:
-  I2C(uint8_t addr);
-#if defined(ENABLE_I2C_SCAN)
-  I2C(); // will try to guess the address (scan all possibilities)
-#endif
+  I2C();
 
   typedef enum : uint8_t {
     NO_ERR = 0,
@@ -53,10 +49,16 @@ public:
     COM_ERR = 2,
   } error;
   error err;
-  uint8_t force = false;
+  // used for testing (see README.md)
+  uint8_t test = false;
 
-  void init();
-  void write(uint8_t *data, uint8_t len);
-  void stop();
-  void off();
+  void init();                              // default init
+  void init(uint8_t addr, uint16_t speed);  // set bus parameters and init
+  void send(uint8_t data);                  // send one byte only and stop
+  void send_ln(uint8_t *data, uint8_t len); // send len bytes and stop
+  void off(); // turn off TWI module and restore interrupts
+
+#if defined(ENABLE_I2C_SCAN)
+  uint8_t scan(); // scan for device address
+#endif
 };
