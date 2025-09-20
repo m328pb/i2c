@@ -5,7 +5,7 @@
 	"keywords":"I2C, atmega328, avr",
 	"repository":{
 		"type":"git",
-		"url":"https://github.com/zielaskowski/i2c"
+		"url":"https://github.com/m328pb/i2c"
 	},
 	"authors":{
 		"name":"Michal Zielaskowski",

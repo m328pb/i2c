@@ -29,13 +29,13 @@ uint8_t I2C::scan() {
 #endif
 
 /*
-* @brief initialize with given parameters
-* @params addr device address
-* @params speed communication speed in !!kHz!!
-* @details
-* set device address and speed. Max speed is 400kHz theoretically
-* but do not exceed 200kHz
-*/
+ * @brief initialize with given parameters
+ * @params addr device address
+ * @params speed communication speed in !!kHz!!
+ * @details
+ * set device address and speed. Max speed is 400kHz theoretically
+ * but do not exceed 200kHz
+ */
 void I2C::init(uint8_t addr, uint16_t speed) {
   this->addr = addr;
   if (speed != this->speed) {
@@ -46,10 +46,10 @@ void I2C::init(uint8_t addr, uint16_t speed) {
 }
 
 /*
-* @brief initialize with default parameters
-* @details
-* initialize with defaults parameters or previously set
-*/
+ * @brief initialize with default parameters
+ * @details
+ * initialize with defaults parameters or previously set
+ */
 void I2C::init() {
   _PRR &= ~(1 << _PRTWI); // turn on TWI
   backup_TWIE = _TWCR & (1 << TWIE);
@@ -68,34 +68,10 @@ void I2C::init() {
   PORTC |= (1 << PC5); // pullup for scl
 }
 
-/*
-* @brief return TRUE when no error or FALSE
-* @details
-* I2C status is in TWSR register (p.200 ATmega328P datasheet)
-* before you start refactoring: using direct casting to enum type,
-* like return (I2C_status)(TWSR & TWSR_mask) is not safe,
-* unless all possible values will be defined in enum variable
-*/
-uint8_t I2C::TWSR_status() {
-  if (test)
-    return true;
-  uint8_t code = _TWSR & TWSR_mask;
-  switch (code) {
-  case 0x08: // TW_START
-    return 1;
-  case 0x18: // TW_ACK
-    return 1;
-  case 0x28: // TW_DATA_ACK
-    return 1;
-  default:
-    return 0;
-  }
-}
-
 /**
  * @brief Send data to the slave device over I2C
- * @param data 8 bit data to send
- * @param len number of bytes to send
+ * @param data - data to send
+ * @param len - number of bytes to send
  * @details
  * This function sends data to the slave device over I2C.
  * It sends a start condition, the slave device address (with W bit set),
@@ -133,14 +109,39 @@ void I2C::send(uint8_t data) { send_ln(&data, 1); }
 
 /*
  * @brief turn off TWI and restore interrupts status
-*/
+ */
 void I2C::off() {
-  _PRR |= 1 << _PRTWI;  // turn off TWI
-  _TWCR |= backup_TWIE; // restore interrupts
+  _PRR |= 1 << _PRTWI;                          // turn off TWI
+  _TWCR = (_TWCR & ~(1 << TWIE)) | backup_TWIE; // restore interrupts
 }
 
 // private functions
 // ****************
+
+/*
+ * @brief return TRUE when no error or FALSE
+ * @details
+ * I2C status is in TWSR register (p.200 ATmega328P datasheet)
+ * before you start refactoring: using direct casting to enum type,
+ * like return (I2C_status)(TWSR & TWSR_mask) is not safe,
+ * unless all possible values will be defined in enum variable
+ */
+uint8_t I2C::TWSR_status() {
+  if (test)
+    return true;
+  uint8_t code = _TWSR & TWSR_mask;
+  switch (code) {
+  case 0x08: // TW_START
+    return 1;
+  case 0x18: // TW_ACK
+    return 1;
+  case 0x28: // TW_DATA_ACK
+    return 1;
+  default:
+    return 0;
+  }
+}
+
 void I2C::send_byte(uint8_t data) {
   _TWDR = data;
   _TWCR = (1 << TWINT) | (1 << TWEN);
@@ -152,6 +153,7 @@ void I2C::send_byte(uint8_t data) {
     err = COM_ERR;
   };
 }
+
 void I2C::start() {
   // Master Transmitter Mode (atmega328p, p.185)
   // send start condition
@@ -181,10 +183,11 @@ void I2C::send_addr(uint8_t addr) {
     err = DEV_ERR;
   };
 }
+
 void I2C::stop() {
   _TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
   // wait for STOP flag cleared: STOP transmition completed
   // otherway can be interpreted as REPEATED START
-  while (_TWCR & (1 << TWSTO))
-    ;
+  do {
+  } while (_TWCR & (1 << TWSTO));
 }
