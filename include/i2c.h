@@ -36,7 +36,7 @@ private:
 
   void start();
   void stop();
-  void send_addr(uint8_t addr);
+  void send_addr();
   void send_byte(uint8_t data);
   uint8_t TWSR_status();
 

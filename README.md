@@ -18,7 +18,7 @@ AVR Memory Usage
 ----------------
 Device: Unknown
 
-Program:     414 bytes
+Program:     754 bytes
 (.text + .data + .bootloader)
 
 Data:          0 bytes
@@ -59,7 +59,7 @@ Class also exposes I2C.err variable of type error:
 When library compiled with ENABLE_I2C_SCAN directive, aditional method uint8_t I2C::scan()
 will be available. The method will scan through all addresses and set one
 when recive ACK. Return address on success or 0. Do not forget to init() after
-setting new address. In most cases not needed and waste memory (aditional 214 bytes),
+setting new address. In most cases not needed and waste memory (aditional 114 bytes),
 but can be usefull in rare cases when device address is not known.
 
 ## example

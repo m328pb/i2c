@@ -14,13 +14,13 @@ I2C::I2C() {}
  *
  */
 uint8_t I2C::scan() {
-  for (uint8_t i = 0x20; i <= 0x27; i++) {
-    init();
+  for (uint8_t i = 0x08; i <= 0x77; i++) {
+    init(i, speed);
     start();
-    send_addr(i);
-    if (err == NO_ERR) {
+    send_addr();
+    stop();
+    if ((err == NO_ERR) & !test) {
       this->addr = i;
-      stop();
       return i;
     }
   }
@@ -38,11 +38,9 @@ uint8_t I2C::scan() {
  */
 void I2C::init(uint8_t addr, uint16_t speed) {
   this->addr = addr;
-  if (speed != this->speed) {
-    this->speed = speed;
-    off();
-    init();
-  }
+  this->speed = speed;
+  off();
+  init();
 }
 
 /*
@@ -61,7 +59,7 @@ void I2C::init() {
   note: TWBR should be 10 or higher for master mode*/
   _TWSR &= ~(1 << TWPS0); // initialize twi prescaler and bit rate
   _TWSR &= ~(1 << TWPS1); // set prescaler to 1
-  _TWBR = ((F_CPU / (speed * 1000)) - 16) / 2;
+  _TWBR = ((F_CPU / ((uint32_t)speed * 1000)) - 16) / 2;
 
   // activate internal pullups for twi.
   PORTC |= (1 << PC4); // pullup for sda
@@ -84,7 +82,7 @@ void I2C::send_ln(uint8_t *data, uint8_t len)
   if (err != NO_ERR)
     return;
 
-  send_addr(this->addr);
+  send_addr();
   if (err != NO_ERR)
     return;
 
@@ -169,7 +167,7 @@ void I2C::start() {
   };
 }
 
-void I2C::send_addr(uint8_t addr) {
+void I2C::send_addr() {
   // build sla+w, slave device address + w bit (0 write to slave)
   _TWDR = addr << 1;
   // transmit address
