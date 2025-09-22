@@ -12,7 +12,6 @@
 		"email":"michal.zielaskowski@gmail.com"
 	},
 	"license":"MIT",
-	"frameworks":"arduino",
 	"platforms":"atmelvar",
 	"examples":[
 		"examples/*/*.c"
