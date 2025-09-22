@@ -1,7 +1,5 @@
 #include "i2c.h"
-#include <avr/interrupt.h>
 #include <avr/io.h>
-#include <stdint.h>
 
 I2C::I2C() {}
 
