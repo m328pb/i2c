@@ -11,7 +11,7 @@
 		"name":"Michal Zielaskowski",
 		"email":"michal.zielaskowski@gmail.com"
 	},
-	"license":"GNU General Public License v3.0",
+	"license":"GPL-3.0 license",
 	"platforms":"atmelvar",
 	"examples":[
 		"examples/*/*.c"
